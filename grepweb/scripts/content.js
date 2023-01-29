@@ -12,36 +12,63 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const article = document.querySelector("article");
+const homeInfoPage = document.getElementsByClassName("HomeInfoV2")
 
-// `document.querySelector` may return null if the selector doesn't match anything.
-if (article) {
-  const text = article.textContent;
-  /**
-   * Regular expression to find all "words" in a string.
-   *
-   * Here, a "word" is a sequence of one or more non-whitespace characters in a row. We don't use the
-   * regular expression character class "\w" to match against "word characters" because it only
-   * matches against the Latin alphabet. Instead, we match against any sequence of characters that
-   * *are not* a whitespace characters. See the below link for more information.
-   * 
-   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
-   */
-  const wordMatchRegExp = /[^\s]+/g;
-  const words = text.matchAll(wordMatchRegExp);
-  // matchAll returns an iterator, convert to array to get word count
-  const wordCount = [...words].length;
-  const readingTime = Math.round(wordCount / 200);
-  const badge = document.createElement("p");
-  // Use the same styling as the publish information in an article's header
-  badge.classList.add("color-secondary-text", "type--caption");
-  badge.textContent = `⏱️ ${readingTime} min read`;
+if (homeInfoPage) {
+    let elem = homeInfoPage.item(0).innerText;
+    let factSqFt = getValueOfSuffixFromList(elem.split('\n'), 'Sq Ft');
 
-  // Support for API reference docs
-  const heading = article.querySelector("h1");
-  // Support for article docs with date
-  const date = article.querySelector("time")?.parentNode;
+    elem = document.getElementsByClassName("keyDetailsList")
+    let lotSize = getValueOfPrefixFromList(elem.item(0).innerText.split('\n'), 'Lot Size');
 
-  // https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentElement
-  (date ?? heading).insertAdjacentElement("afterend", badge);
+    elem = document.getElementsByClassName("keyDetailsList")
+    let sqFtPrice = getValueOfPrefixFromList(elem.item(1).innerText.split('\n'), 'Price/Sq.Ft.');
+
+    elem = document.getElementsByClassName("homeAddress")
+    let addr = elem.item(0).innerText.split('\n')[0];
+    let city = elem.item(0).innerText.split('\n')[1];
+    if(city){
+        city = city.split(',')[0];
+    }
+
+
+    var div = document.createElement("div");
+    div.id = "grep_info";
+    
+    let ul = document.createElement('ul');    
+    ul.appendChild(buildListItem(`${addr}`));
+    ul.appendChild(buildListItem(`${city}`));
+    ul.appendChild(buildListItem(`[⏱️] Area: ${factSqFt} | Lot Size: ${lotSize} | Price/Sq.Ft.: ${sqFtPrice}`));
+    div.appendChild(ul);
+
+    div.style.top = 120 + 'px';
+    div.style.display = "block";
+    div.style.backgroundColor = '#80ced6';
+    document.body.prepend(div);
+}
+
+function buildListItem(text) {
+    let li = document.createElement('li');
+    li.textContent = text;
+    return li;
+}
+
+function getValueOfPrefixFromList(items, prefixLabel) {
+    let fact = undefined;   
+    for ( let i = 0; i < items.length -1;i++){
+        if (items[i] == prefixLabel){
+            fact = `${items[i+1]}`;
+        }
+    }
+    return fact
+}
+
+function getValueOfSuffixFromList(items, suffixLabel) {
+    let fact = undefined;   
+    for ( let i = 0; i < items.length ;i++){
+        if (items[i] == suffixLabel){
+            fact = `${items[i-1]} ${suffixLabel}`;
+        }
+    }
+    return fact
 }
