@@ -10,7 +10,7 @@
         "scripts/content.js"
       ],
       "matches": [
-        "*://*.redfin.com/*"
+        "https://www.redfin.com/*"
       ],
       "run_at":"document_end"
     }
