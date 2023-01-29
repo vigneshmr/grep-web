@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Grep Web",
+  "name": "Redfin TLDR",
   "version": "1.0",
-  "description": "Extension to grep and show lines on the site that you visit",
+  "description": "Tiny extension to grep and show important info on redfin for quick tldr",
 
   "content_scripts": [
     {
