@@ -59,10 +59,31 @@ if (homeInfoPage) {
     }
     div.appendChild(ul);
 
+    // lot info ...
+    let lotInfoDiv = getDivForLotInfo();
+    if(lotInfoDiv) {
+        lotInfoDiv.style.fontSize = '12px';
+
+        var text = lotInfoDiv.innerHTML;
+        var newText = text.replace(/yard/ig, '<span style="background-color: yellow;">$&</span>');
+        lotInfoDiv.innerHTML = newText;
+
+        div.append(lotInfoDiv);
+    }
+
     div.style.top = 120 + 'px';
     div.style.display = "block";
     div.style.backgroundColor = '#80ced6';
+    
     document.body.prepend(div);
+}
+
+function getDivForLotInfo() {
+    var xpath = "//div[text()='Lot Information']";
+    var matchingElement = document.evaluate(
+        xpath, document, null, 
+        XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    return matchingElement.parentNode;
 }
 
 function buildListItem(text) {
