@@ -22,6 +22,9 @@ if (homeInfoPage) {
     let lotSize = getValueOfPrefixFromList(elem.item(0).innerText.split('\n'), 'Lot Size');
 
     elem = document.getElementsByClassName("keyDetailsList")
+    let yearBuilt = getValueOfPrefixFromList(elem.item(0).innerText.split('\n'), 'Year Built');
+
+    elem = document.getElementsByClassName("keyDetailsList")
     let sqFtPrice = getValueOfPrefixFromList(elem.item(1).innerText.split('\n'), 'Price/Sq.Ft.');
 
     elem = document.getElementsByClassName("homeAddress")
@@ -31,6 +34,17 @@ if (homeInfoPage) {
         city = city.split(',')[0];
     }
 
+    let sqFtNum
+    let acreNum
+    if(lotSize.includes("Acres")) {
+        sqFtNum = Number(lotSize.replace(' Acres', '').replace(',',''))*43560;
+    } else if (lotSize.includes("Sq. Ft.")) {
+        sqFtNum = Number(lotSize.replace(' Sq. Ft.', '').replace(',',''));
+    }
+
+    sqFtNum = sqFtNum.toFixed(0);
+    acreNum = sqFtNum/43560;
+    acreNum = acreNum.toFixed(2);
 
     var div = document.createElement("div");
     div.id = "grep_info";
@@ -38,7 +52,11 @@ if (homeInfoPage) {
     let ul = document.createElement('ul');    
     ul.appendChild(buildListItem(`${addr}`));
     ul.appendChild(buildListItem(`${city}`));
-    ul.appendChild(buildListItem(`[⏱️] Area: ${factSqFt} | Lot Size: ${lotSize} | Price/Sq.Ft.: ${sqFtPrice}`));
+    ul.appendChild(buildListItem(`[📏] Area: ${factSqFt} | Lot Size: ${acreNum} acr / ${sqFtNum} sq.ft | Price/Sq.Ft.: ${sqFtPrice}`));
+
+    if(yearBuilt) {
+        ul.appendChild(buildListItem(`[⏱️] Age: ${new Date().getFullYear() - Number(yearBuilt)} years (built: ${yearBuilt})`));
+    }
     div.appendChild(ul);
 
     div.style.top = 120 + 'px';
