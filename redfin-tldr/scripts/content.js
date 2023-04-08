@@ -17,7 +17,7 @@ const homeInfoPage = document.getElementsByClassName("HomeInfoV2")
 const curFormatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-  
+
     // These options are needed to round to whole numbers if that's what you want.
     minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
     //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
@@ -27,16 +27,16 @@ const curFormatter = new Intl.NumberFormat('en-US', {
 function areaStrToValues(lotSize) {
     let lotSqFtNum
     let lotAcreNum
-    if(lotSize.includes("Acres")) {
-        lotSqFtNum = Number(lotSize.replaceAll(' Acres', '').replaceAll(',',''))*43560;
+    if (lotSize.includes("Acres")) {
+        lotSqFtNum = Number(lotSize.replaceAll(' Acres', '').replaceAll(',', '')) * 43560;
     } else if (lotSize.includes("Sq. Ft.")) {
-        lotSqFtNum = Number(lotSize.replaceAll(' Sq. Ft.', '').replaceAll(',',''));
+        lotSqFtNum = Number(lotSize.replaceAll(' Sq. Ft.', '').replaceAll(',', ''));
     } else if (lotSize.includes("Sq Ft")) {
-        lotSqFtNum = Number(lotSize.replaceAll(' Sq Ft', '').replaceAll(',',''));
+        lotSqFtNum = Number(lotSize.replaceAll(' Sq Ft', '').replaceAll(',', ''));
     }
 
     lotSqFtNum = lotSqFtNum.toFixed(0);
-    lotAcreNum = lotSqFtNum/43560;
+    lotAcreNum = lotSqFtNum / 43560;
     lotAcreNum = lotAcreNum.toFixed(2);
     return [lotSqFtNum, lotAcreNum];
 }
@@ -44,7 +44,7 @@ function areaStrToValues(lotSize) {
 function titleCase(str) {
     str = str.toLowerCase().split(' ');
     for (var i = 0; i < str.length; i++) {
-      str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1); 
+        str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
     }
     return str.join(' ');
 }
@@ -65,17 +65,17 @@ if (homeInfoPage) {
     // price
     elem = document.getElementsByClassName("keyDetailsList")
     let listPrice = getValueOfPrefixFromList(elem.item(1).innerText.split('\n'), 'List Price');
-    if(!listPrice){
+    if (!listPrice) {
         listPrice = document.getElementsByClassName('statsValue')[0].textContent;
     }
-    if(listPrice){
-        listPrice = listPrice.replaceAll('$','').replaceAll(',','');
+    if (listPrice) {
+        listPrice = listPrice.replaceAll('$', '').replaceAll(',', '');
     }
 
     elem = document.getElementsByClassName("keyDetailsList")
     let rfEstiPrice = getValueOfPrefixFromList(elem.item(1).innerText.split('\n'), 'Redfin Estimate');
-    if(rfEstiPrice){
-        rfEstiPrice = rfEstiPrice.replaceAll('$','').replaceAll(',','');
+    if (rfEstiPrice) {
+        rfEstiPrice = rfEstiPrice.replaceAll('$', '').replaceAll(',', '');
     }
 
     elem = document.getElementsByClassName("homeAddress")
@@ -84,16 +84,16 @@ if (homeInfoPage) {
     addr = titleCase(addr);             // make it title case
 
     let city = elem.item(0).innerText.split('\n')[1];
-    if(city){
+    if (city) {
         city = city.split(',')[0];
     }
 
-    let [lotSqFtNum,lotAcreNum] = areaStrToValues(lotSize);
-    let [livableSqFtNum,livableAcreNum] = areaStrToValues(factSqFt);
-    
+    let [lotSqFtNum, lotAcreNum] = areaStrToValues(lotSize);
+    let [livableSqFtNum, livableAcreNum] = areaStrToValues(factSqFt);
+
     var div = document.createElement("div");
     div.id = "grep_info";
-    
+
     let ul = document.createElement('ul');
 
     // address item ...
@@ -103,57 +103,62 @@ if (homeInfoPage) {
     itemAddr.style.cursor = 'pointer';
     itemAddr.style.color = 'white';
     itemAddr.style.fontWeight = 'bold';
-    itemAddr.addEventListener('click', function(evt){
-         copyURIToClipboard(evt);
-         console.log(`Copied to clipboard: ${addr}`);
-         evt.target.blur();
+    itemAddr.addEventListener('click', function (evt) {
+        copyURIToClipboard(evt);
+        console.log(`Copied to clipboard: ${addr}`);
+        evt.target.blur();
     });
     ul.appendChild(itemAddr);
 
     // other items ...
     ul.appendChild(buildListItem(`${city}`));
     ul.appendChild(buildListItem(`[📏] Area: ${factSqFt} | Lot Size: ${lotAcreNum} acr / ${lotSqFtNum} sq.ft`));
-    
+
     let liPrice = `[💰] Listed: Price: ${curFormatter.format(listPrice)} Price/Sq.Ft.: ${sqFtPrice}`;
-    if(rfEstiPrice){
-        liPrice += ` | EstΔ %: ${(100*(rfEstiPrice-listPrice)/listPrice).toFixed(1)}% ${curFormatter.format(rfEstiPrice-listPrice)}`;
+    if (rfEstiPrice) {
+        liPrice += ` | EstΔ %: ${(100 * (rfEstiPrice - listPrice) / listPrice).toFixed(1)}% ${curFormatter.format(rfEstiPrice - listPrice)}`;
     }
     ul.appendChild(buildListItem(liPrice));
-    if(rfEstiPrice) {
-        ul.appendChild(buildListItem(`[💰] Listed: Estimated: ${curFormatter.format(rfEstiPrice)} Price/Sq.Ft.: ${curFormatter.format((rfEstiPrice/livableSqFtNum).toFixed(0))}`));
+    if (rfEstiPrice) {
+        ul.appendChild(buildListItem(`[💰] Listed: Estimated: ${curFormatter.format(rfEstiPrice)} Price/Sq.Ft.: ${curFormatter.format((rfEstiPrice / livableSqFtNum).toFixed(0))}`));
     }
 
-    if(yearBuilt) {
+    if (yearBuilt) {
         ul.appendChild(buildListItem(`[⏱️] Age: ${new Date().getFullYear() - Number(yearBuilt)} years (built: ${yearBuilt})`));
     }
     div.appendChild(ul);
 
-    // lot info ...
-    let lotInfoDiv = getDivForLotInfo();
-    if(lotInfoDiv) {
-        lotInfoDiv.style.fontSize = '12px';
-
-        var text = lotInfoDiv.innerHTML;
-        var newText = text.replace(/yard/ig, '<span style="background-color: blue;">$&</span>');
-        lotInfoDiv.innerHTML = newText;
-        div.append('Lot info');
-        div.append(lotInfoDiv);
-    }
+    summarizeDiv(div, 'Lot Information', 'Lot info');
+    summarizeDiv(div, 'Garage & Parking', 'Garage');
 
     div.style.top = 120 + 'px';
     div.style.display = "block";
     div.style.backgroundColor = '#000000';
     div.style.color = '#ffffff';
-    
+
     document.body.prepend(div);
 }
 
-function getDivForLotInfo() {
-    var xpath = "//div[text()='Lot Information']";
+function summarizeDiv(rootDiv, divTitleStr, title) {
+    let innerDiv = getDivForSection(divTitleStr)
+    if (!innerDiv) {
+        return
+    }
+    innerDiv.style.fontSize = '12px';
+
+    var text = innerDiv.innerHTML;
+    var newText = text.replace(/yard/ig, '<span style="background-color: blue;">$&</span>');
+    innerDiv.innerHTML = newText;
+    rootDiv.append(title);
+    rootDiv.append(innerDiv);
+}
+
+function getDivForSection(divTitleStr) {
+    var xpath = `//div[text()='${divTitleStr}']`;
     var matchingElement = document.evaluate(
-        xpath, document, null, 
+        xpath, document, null,
         XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    let gg= matchingElement.parentNode;
+    let gg = matchingElement.parentNode;
     gg.removeChild(gg.firstChild);
     return gg;
 }
@@ -165,20 +170,20 @@ function buildListItem(text) {
 }
 
 function getValueOfPrefixFromList(items, prefixLabel) {
-    let fact = undefined;   
-    for ( let i = 0; i < items.length -1;i++){
-        if (items[i] == prefixLabel){
-            fact = `${items[i+1]}`;
+    let fact = undefined;
+    for (let i = 0; i < items.length - 1; i++) {
+        if (items[i] == prefixLabel) {
+            fact = `${items[i + 1]}`;
         }
     }
     return fact
 }
 
 function getValueOfSuffixFromList(items, suffixLabel) {
-    let fact = undefined;   
-    for ( let i = 0; i < items.length ;i++){
-        if (items[i] == suffixLabel){
-            fact = `${items[i-1]} ${suffixLabel}`;
+    let fact = undefined;
+    for (let i = 0; i < items.length; i++) {
+        if (items[i] == suffixLabel) {
+            fact = `${items[i - 1]} ${suffixLabel}`;
         }
     }
     return fact
@@ -195,7 +200,7 @@ function copyURIToClipboard(evt) {
     selection.addRange(range);
     document.execCommand('copy');
     hrefObj.blur();
-    hrefObj.setAttribute('style',styleCopyCSS);
+    hrefObj.setAttribute('style', styleCopyCSS);
     window.getSelection().removeAllRanges();
     evt.preventDefault()
 }
@@ -203,26 +208,25 @@ function copyURIToClipboard(evt) {
 function copyTextToClipboard(text) {
     //Create a textbox field where we can insert text to. 
     var copyFrom = document.createElement("textarea");
-  
+
     //Set the text content to be the text you wished to copy.
     copyFrom.textContent = text;
-  
+
     //Append the textbox field into the body as a child. 
     //"execCommand()" only works when there exists selected text, and the text is inside 
     //document.body (meaning the text is part of a valid rendered HTML element).
     document.body.appendChild(copyFrom);
-  
+
     //Select all the text!
     copyFrom.select();
-  
+
     //Execute command
     document.execCommand('copy');
-  
+
     //(Optional) De-select the text using blur(). 
     copyFrom.blur();
-  
+
     //Remove the textbox field from the document.body, so no other JavaScript nor 
     //other elements can get access to this.
     document.body.removeChild(copyFrom);
-  }
-  
+}
