@@ -94,8 +94,23 @@ if (homeInfoPage) {
     var div = document.createElement("div");
     div.id = "grep_info";
     
-    let ul = document.createElement('ul');    
-    ul.appendChild(buildListItem(`${addr}`));
+    let ul = document.createElement('ul');
+
+    // address item ...
+    let itemAddr = document.createElement('a');
+    itemAddr.href = document.URL;
+    itemAddr.text = `${addr}`;
+    itemAddr.style.cursor = 'pointer';
+    itemAddr.style.color = 'white';
+    itemAddr.style.fontWeight = 'bold';
+    itemAddr.addEventListener('click', function(evt){
+         copyURIToClipboard(evt);
+         console.log(`Copied to clipboard: ${addr}`);
+         evt.target.blur();
+    });
+    ul.appendChild(itemAddr);
+
+    // other items ...
     ul.appendChild(buildListItem(`${city}`));
     ul.appendChild(buildListItem(`[📏] Area: ${factSqFt} | Lot Size: ${lotAcreNum} acr / ${lotSqFtNum} sq.ft`));
     
@@ -168,3 +183,46 @@ function getValueOfSuffixFromList(items, suffixLabel) {
     }
     return fact
 }
+
+function copyURIToClipboard(evt) {
+    hrefObj = evt.target;
+    let styleCopyCSS = hrefObj.getAttribute('style');
+    hrefObj.removeAttribute('style');
+    const range = document.createRange();
+    range.selectNode(hrefObj);
+    let selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    document.execCommand('copy');
+    hrefObj.blur();
+    hrefObj.setAttribute('style',styleCopyCSS);
+    window.getSelection().removeAllRanges();
+    evt.preventDefault()
+}
+
+function copyTextToClipboard(text) {
+    //Create a textbox field where we can insert text to. 
+    var copyFrom = document.createElement("textarea");
+  
+    //Set the text content to be the text you wished to copy.
+    copyFrom.textContent = text;
+  
+    //Append the textbox field into the body as a child. 
+    //"execCommand()" only works when there exists selected text, and the text is inside 
+    //document.body (meaning the text is part of a valid rendered HTML element).
+    document.body.appendChild(copyFrom);
+  
+    //Select all the text!
+    copyFrom.select();
+  
+    //Execute command
+    document.execCommand('copy');
+  
+    //(Optional) De-select the text using blur(). 
+    copyFrom.blur();
+  
+    //Remove the textbox field from the document.body, so no other JavaScript nor 
+    //other elements can get access to this.
+    document.body.removeChild(copyFrom);
+  }
+  
