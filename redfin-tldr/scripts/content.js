@@ -14,6 +14,33 @@
 
 const homeInfoPage = document.getElementsByClassName("HomeInfoV2")
 
+const curFormatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  
+    // These options are needed to round to whole numbers if that's what you want.
+    minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+    //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+  });
+
+// returns [sqFt, acres]
+function areaStrToValues(lotSize) {
+    let lotSqFtNum
+    let lotAcreNum
+    if(lotSize.includes("Acres")) {
+        lotSqFtNum = Number(lotSize.replaceAll(' Acres', '').replaceAll(',',''))*43560;
+    } else if (lotSize.includes("Sq. Ft.")) {
+        lotSqFtNum = Number(lotSize.replaceAll(' Sq. Ft.', '').replaceAll(',',''));
+    } else if (lotSize.includes("Sq Ft")) {
+        lotSqFtNum = Number(lotSize.replaceAll(' Sq Ft', '').replaceAll(',',''));
+    }
+
+    lotSqFtNum = lotSqFtNum.toFixed(0);
+    lotAcreNum = lotSqFtNum/43560;
+    lotAcreNum = lotAcreNum.toFixed(2);
+    return [lotSqFtNum, lotAcreNum];
+}
+
 if (homeInfoPage) {
     let elem = homeInfoPage.item(0).innerText;
     let factSqFt = getValueOfSuffixFromList(elem.split('\n'), 'Sq Ft');
@@ -27,6 +54,19 @@ if (homeInfoPage) {
     elem = document.getElementsByClassName("keyDetailsList")
     let sqFtPrice = getValueOfPrefixFromList(elem.item(1).innerText.split('\n'), 'Price/Sq.Ft.');
 
+    // price
+    elem = document.getElementsByClassName("keyDetailsList")
+    let listPrice = getValueOfPrefixFromList(elem.item(1).innerText.split('\n'), 'List Price');
+    if(listPrice){
+        listPrice = listPrice.replaceAll('$','').replaceAll(',','');
+    }
+
+    elem = document.getElementsByClassName("keyDetailsList")
+    let rfEstiPrice = getValueOfPrefixFromList(elem.item(1).innerText.split('\n'), 'Redfin Estimate');
+    if(rfEstiPrice){
+        rfEstiPrice = rfEstiPrice.replaceAll('$','').replaceAll(',','');
+    }
+
     elem = document.getElementsByClassName("homeAddress")
     let addr = elem.item(0).innerText.split('\n')[0];
     let city = elem.item(0).innerText.split('\n')[1];
@@ -34,18 +74,9 @@ if (homeInfoPage) {
         city = city.split(',')[0];
     }
 
-    let lotSqFtNum
-    let lotAcreNum
-    if(lotSize.includes("Acres")) {
-        lotSqFtNum = Number(lotSize.replace(' Acres', '').replace(',',''))*43560;
-    } else if (lotSize.includes("Sq. Ft.")) {
-        lotSqFtNum = Number(lotSize.replace(' Sq. Ft.', '').replace(',',''));
-    }
-
-    lotSqFtNum = lotSqFtNum.toFixed(0);
-    lotAcreNum = lotSqFtNum/43560;
-    lotAcreNum = lotAcreNum.toFixed(2);
-
+    let [lotSqFtNum,lotAcreNum] = areaStrToValues(lotSize);
+    let [livableSqFtNum,livableAcreNum] = areaStrToValues(factSqFt);
+    
     var div = document.createElement("div");
     div.id = "grep_info";
     
@@ -53,7 +84,8 @@ if (homeInfoPage) {
     ul.appendChild(buildListItem(`${addr}`));
     ul.appendChild(buildListItem(`${city}`));
     ul.appendChild(buildListItem(`[📏] Area: ${factSqFt} | Lot Size: ${lotAcreNum} acr / ${lotSqFtNum} sq.ft`));
-    ul.appendChild(buildListItem(`[💰] Price/Sq.Ft.: ${sqFtPrice}`));
+    ul.appendChild(buildListItem(`[💰] Listed: Price: ${curFormatter.format(listPrice)} Price/Sq.Ft.: ${sqFtPrice} |  EstΔ %: ${(100*(rfEstiPrice-listPrice)/listPrice).toFixed(1)}% ${curFormatter.format(rfEstiPrice-listPrice)}`));
+    ul.appendChild(buildListItem(`[💰] Listed: Estimated: ${curFormatter.format(rfEstiPrice)} Price/Sq.Ft.: ${curFormatter.format((rfEstiPrice/livableSqFtNum).toFixed(0))}`));
 
     if(yearBuilt) {
         ul.appendChild(buildListItem(`[⏱️] Age: ${new Date().getFullYear() - Number(yearBuilt)} years (built: ${yearBuilt})`));
