@@ -50,21 +50,21 @@ function titleCase(str) {
 }
 
 if (homeInfoPage) {
-    let elem = homeInfoPage.item(0).innerText;
+    let elem = homeInfoPage.item(0)?.innerText;
     let factSqFt = getValueOfSuffixFromList(elem.split('\n'), 'Sq Ft');
 
     elem = document.getElementsByClassName("keyDetailsList")
-    let lotSize = getValueOfPrefixFromList(elem.item(0).innerText.split('\n'), 'Lot Size');
+    let lotSize = getValueOfPrefixFromList(elem.item(0)?.innerText.split('\n'), 'Lot Size');
 
     elem = document.getElementsByClassName("keyDetailsList")
-    let yearBuilt = getValueOfPrefixFromList(elem.item(0).innerText.split('\n'), 'Year Built');
+    let yearBuilt = getValueOfPrefixFromList(elem.item(0)?.innerText.split('\n'), 'Year Built');
 
     elem = document.getElementsByClassName("keyDetailsList")
-    let sqFtPrice = getValueOfPrefixFromList(elem.item(1).innerText.split('\n'), 'Price/Sq.Ft.');
+    let sqFtPrice = getValueOfPrefixFromList(elem.item(1)?.innerText.split('\n'), 'Price/Sq.Ft.');
 
     // price
     elem = document.getElementsByClassName("keyDetailsList")
-    let listPrice = getValueOfPrefixFromList(elem.item(1).innerText.split('\n'), 'List Price');
+    let listPrice = getValueOfPrefixFromList(elem.item(1)?.innerText.split('\n'), 'List Price');
     if (!listPrice) {
         listPrice = document.getElementsByClassName('statsValue')[0].textContent;
     }
@@ -73,23 +73,29 @@ if (homeInfoPage) {
     }
 
     elem = document.getElementsByClassName("keyDetailsList")
-    let rfEstiPrice = getValueOfPrefixFromList(elem.item(1).innerText.split('\n'), 'Redfin Estimate');
+    let rfEstiPrice = getValueOfPrefixFromList(elem.item(1)?.innerText.split('\n'), 'Redfin Estimate');
     if (rfEstiPrice) {
         rfEstiPrice = rfEstiPrice.replaceAll('$', '').replaceAll(',', '');
     }
 
     elem = document.getElementsByClassName("homeAddress")
-    let addr = elem.item(0).innerText.split('\n')[0];
+    let addr = elem.item(0)?.innerText.split('\n')[0];
     addr = addr.replace(/,\s*$/, "");   // remove comma
     addr = titleCase(addr);             // make it title case
 
-    let city = elem.item(0).innerText.split('\n')[1];
+    let city = elem.item(0)?.innerText.split('\n')[1];
     if (city) {
         city = city.split(',')[0];
     }
 
-    let [lotSqFtNum, lotAcreNum] = areaStrToValues(lotSize);
-    let [livableSqFtNum, livableAcreNum] = areaStrToValues(factSqFt);
+    let lotSqFtNum, lotAcreNum;
+    let livableSqFtNum, livableAcreNum;
+    if (lotSize) {
+        [lotSqFtNum, lotAcreNum] = areaStrToValues(lotSize);
+    }
+    if (factSqFt) {
+        [livableSqFtNum, livableAcreNum] = areaStrToValues(factSqFt);
+    }
 
     var div = document.createElement("div");
     div.id = "grep_info";
@@ -141,16 +147,14 @@ if (homeInfoPage) {
 
 function summarizeDiv(rootDiv, divTitleStr, title) {
     let innerDiv = getDivForSection(divTitleStr)
-    if (!innerDiv) {
-        return
+    if (innerDiv) {
+        innerDiv.style.fontSize = '12px';
+        var text = innerDiv.innerHTML;
+        var newText = text.replace(/yard/ig, '<span style="background-color: blue;">$&</span>');
+        innerDiv.innerHTML = newText;
+        rootDiv.append(title);
+        rootDiv.append(innerDiv);
     }
-    innerDiv.style.fontSize = '12px';
-
-    var text = innerDiv.innerHTML;
-    var newText = text.replace(/yard/ig, '<span style="background-color: blue;">$&</span>');
-    innerDiv.innerHTML = newText;
-    rootDiv.append(title);
-    rootDiv.append(innerDiv);
 }
 
 function getDivForSection(divTitleStr) {
@@ -158,8 +162,8 @@ function getDivForSection(divTitleStr) {
     var matchingElement = document.evaluate(
         xpath, document, null,
         XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    let gg = matchingElement.parentNode;
-    gg.removeChild(gg.firstChild);
+    let gg = matchingElement?.parentNode;
+    gg?.removeChild(gg.firstChild);
     return gg;
 }
 
@@ -171,7 +175,7 @@ function buildListItem(text) {
 
 function getValueOfPrefixFromList(items, prefixLabel) {
     let fact = undefined;
-    for (let i = 0; i < items.length - 1; i++) {
+    for (let i = 0; i < items?.length - 1; i++) {
         if (items[i] == prefixLabel) {
             fact = `${items[i + 1]}`;
         }
