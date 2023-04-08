@@ -21,7 +21,7 @@ const curFormatter = new Intl.NumberFormat('en-US', {
     // These options are needed to round to whole numbers if that's what you want.
     minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
     //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
-  });
+});
 
 // returns [sqFt, acres]
 function areaStrToValues(lotSize) {
@@ -39,6 +39,14 @@ function areaStrToValues(lotSize) {
     lotAcreNum = lotSqFtNum/43560;
     lotAcreNum = lotAcreNum.toFixed(2);
     return [lotSqFtNum, lotAcreNum];
+}
+
+function titleCase(str) {
+    str = str.toLowerCase().split(' ');
+    for (var i = 0; i < str.length; i++) {
+      str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1); 
+    }
+    return str.join(' ');
 }
 
 if (homeInfoPage) {
@@ -72,6 +80,9 @@ if (homeInfoPage) {
 
     elem = document.getElementsByClassName("homeAddress")
     let addr = elem.item(0).innerText.split('\n')[0];
+    addr = addr.replace(/,\s*$/, "");   // remove comma
+    addr = titleCase(addr);             // make it title case
+
     let city = elem.item(0).innerText.split('\n')[1];
     if(city){
         city = city.split(',')[0];
