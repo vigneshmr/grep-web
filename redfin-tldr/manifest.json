@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Redfin TLDR",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Tiny extension to grep and show important info on redfin for quick tldr",
 
   "content_scripts": [
