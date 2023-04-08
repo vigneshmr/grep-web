@@ -150,8 +150,8 @@ if (homeInfoPage) {
     }
     div.appendChild(ul);
 
-    summarizeDiv(divCol2, 'Lot Information', 'Lot info');
-    summarizeDiv(divCol2, 'Garage & Parking', 'Garage');
+    summarizeDiv(divCol2, 'Lot Information', 'Lot info', /yard/ig);
+    summarizeDiv(divCol2, 'Garage & Parking', 'Garage', /[0-9]/g);
 
     // div.style.top = 120 + 'px';
     div.style.display = "block";
@@ -161,16 +161,23 @@ if (homeInfoPage) {
     document.body.prepend(div);
 }
 
-function summarizeDiv(rootDiv, divTitleStr, title) {
+function summarizeDiv(rootDiv, divTitleStr, title, highlightRegEx, highlightColor='blue') {
     let innerDiv = getDivForSection(divTitleStr)
     if (innerDiv) {
         innerDiv.style.fontSize = '12px';
-        var text = innerDiv.innerHTML;
-        var newText = text.replace(/yard/ig, '<span style="background-color: blue;">$&</span>');
-        innerDiv.innerHTML = newText;
+        innerDiv.innerHTML = highlightText(innerDiv.innerHTML, highlightRegEx, highlightColor);
         rootDiv.append(title);
         rootDiv.append(innerDiv);
     }
+}
+
+function boldTextInHTML(text) {
+    return `<span style="font-weight: bold">${text}</span>`;
+}
+
+function highlightText(text, highlightRegEx, highlightColor){
+    var newText = text.replace(highlightRegEx, `<span style="background-color: ${highlightColor};">$&</span>`);
+    return newText
 }
 
 function getDivForSection(divTitleStr) {
