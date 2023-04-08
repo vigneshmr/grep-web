@@ -34,17 +34,17 @@ if (homeInfoPage) {
         city = city.split(',')[0];
     }
 
-    let sqFtNum
-    let acreNum
+    let lotSqFtNum
+    let lotAcreNum
     if(lotSize.includes("Acres")) {
-        sqFtNum = Number(lotSize.replace(' Acres', '').replace(',',''))*43560;
+        lotSqFtNum = Number(lotSize.replace(' Acres', '').replace(',',''))*43560;
     } else if (lotSize.includes("Sq. Ft.")) {
-        sqFtNum = Number(lotSize.replace(' Sq. Ft.', '').replace(',',''));
+        lotSqFtNum = Number(lotSize.replace(' Sq. Ft.', '').replace(',',''));
     }
 
-    sqFtNum = sqFtNum.toFixed(0);
-    acreNum = sqFtNum/43560;
-    acreNum = acreNum.toFixed(2);
+    lotSqFtNum = lotSqFtNum.toFixed(0);
+    lotAcreNum = lotSqFtNum/43560;
+    lotAcreNum = lotAcreNum.toFixed(2);
 
     var div = document.createElement("div");
     div.id = "grep_info";
@@ -52,7 +52,8 @@ if (homeInfoPage) {
     let ul = document.createElement('ul');    
     ul.appendChild(buildListItem(`${addr}`));
     ul.appendChild(buildListItem(`${city}`));
-    ul.appendChild(buildListItem(`[📏] Area: ${factSqFt} | Lot Size: ${acreNum} acr / ${sqFtNum} sq.ft | Price/Sq.Ft.: ${sqFtPrice}`));
+    ul.appendChild(buildListItem(`[📏] Area: ${factSqFt} | Lot Size: ${lotAcreNum} acr / ${lotSqFtNum} sq.ft`));
+    ul.appendChild(buildListItem(`[💰] Price/Sq.Ft.: ${sqFtPrice}`));
 
     if(yearBuilt) {
         ul.appendChild(buildListItem(`[⏱️] Age: ${new Date().getFullYear() - Number(yearBuilt)} years (built: ${yearBuilt})`));
@@ -65,15 +66,16 @@ if (homeInfoPage) {
         lotInfoDiv.style.fontSize = '12px';
 
         var text = lotInfoDiv.innerHTML;
-        var newText = text.replace(/yard/ig, '<span style="background-color: yellow;">$&</span>');
+        var newText = text.replace(/yard/ig, '<span style="background-color: blue;">$&</span>');
         lotInfoDiv.innerHTML = newText;
-
+        div.append('Lot info');
         div.append(lotInfoDiv);
     }
 
     div.style.top = 120 + 'px';
     div.style.display = "block";
-    div.style.backgroundColor = '#80ced6';
+    div.style.backgroundColor = '#000000';
+    div.style.color = '#ffffff';
     
     document.body.prepend(div);
 }
@@ -83,7 +85,9 @@ function getDivForLotInfo() {
     var matchingElement = document.evaluate(
         xpath, document, null, 
         XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    return matchingElement.parentNode;
+    let gg= matchingElement.parentNode;
+    gg.removeChild(gg.firstChild);
+    return gg;
 }
 
 function buildListItem(text) {
