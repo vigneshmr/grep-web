@@ -57,6 +57,9 @@ if (homeInfoPage) {
     // price
     elem = document.getElementsByClassName("keyDetailsList")
     let listPrice = getValueOfPrefixFromList(elem.item(1).innerText.split('\n'), 'List Price');
+    if(!listPrice){
+        listPrice = document.getElementsByClassName('statsValue')[0].textContent;
+    }
     if(listPrice){
         listPrice = listPrice.replaceAll('$','').replaceAll(',','');
     }
@@ -84,8 +87,15 @@ if (homeInfoPage) {
     ul.appendChild(buildListItem(`${addr}`));
     ul.appendChild(buildListItem(`${city}`));
     ul.appendChild(buildListItem(`[📏] Area: ${factSqFt} | Lot Size: ${lotAcreNum} acr / ${lotSqFtNum} sq.ft`));
-    ul.appendChild(buildListItem(`[💰] Listed: Price: ${curFormatter.format(listPrice)} Price/Sq.Ft.: ${sqFtPrice} |  EstΔ %: ${(100*(rfEstiPrice-listPrice)/listPrice).toFixed(1)}% ${curFormatter.format(rfEstiPrice-listPrice)}`));
-    ul.appendChild(buildListItem(`[💰] Listed: Estimated: ${curFormatter.format(rfEstiPrice)} Price/Sq.Ft.: ${curFormatter.format((rfEstiPrice/livableSqFtNum).toFixed(0))}`));
+    
+    let liPrice = `[💰] Listed: Price: ${curFormatter.format(listPrice)} Price/Sq.Ft.: ${sqFtPrice}`;
+    if(rfEstiPrice){
+        liPrice += ` | EstΔ %: ${(100*(rfEstiPrice-listPrice)/listPrice).toFixed(1)}% ${curFormatter.format(rfEstiPrice-listPrice)}`;
+    }
+    ul.appendChild(buildListItem(liPrice));
+    if(rfEstiPrice) {
+        ul.appendChild(buildListItem(`[💰] Listed: Estimated: ${curFormatter.format(rfEstiPrice)} Price/Sq.Ft.: ${curFormatter.format((rfEstiPrice/livableSqFtNum).toFixed(0))}`));
+    }
 
     if(yearBuilt) {
         ul.appendChild(buildListItem(`[⏱️] Age: ${new Date().getFullYear() - Number(yearBuilt)} years (built: ${yearBuilt})`));
