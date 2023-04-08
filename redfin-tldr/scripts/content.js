@@ -99,6 +99,22 @@ if (homeInfoPage) {
 
     var div = document.createElement("div");
     div.id = "grep_info";
+    div.style.display = 'flex';
+
+    var divCol1 = document.createElement("div");
+    divCol1.style.float = 'right';
+    divCol1.style.width = '50%';
+    divCol1.style.height = 1;
+    divCol1.style.flex = '50%';
+    div.appendChild(divCol1);
+
+    var divCol2 = document.createElement("div");
+    divCol2.style.float = 'right';
+    divCol2.style.width = '50%';
+    divCol2.style.height = 1;
+    divCol2.style.flex = '50%';
+    div.appendChild(divCol2);
+
 
     let ul = document.createElement('ul');
 
@@ -134,10 +150,10 @@ if (homeInfoPage) {
     }
     div.appendChild(ul);
 
-    summarizeDiv(div, 'Lot Information', 'Lot info');
-    summarizeDiv(div, 'Garage & Parking', 'Garage');
+    summarizeDiv(divCol2, 'Lot Information', 'Lot info');
+    summarizeDiv(divCol2, 'Garage & Parking', 'Garage');
 
-    div.style.top = 120 + 'px';
+    // div.style.top = 120 + 'px';
     div.style.display = "block";
     div.style.backgroundColor = '#000000';
     div.style.color = '#ffffff';
@@ -170,6 +186,7 @@ function getDivForSection(divTitleStr) {
 function buildListItem(text) {
     let li = document.createElement('li');
     li.textContent = text;
+    li.style.fontSize = '13px';
     return li;
 }
 
